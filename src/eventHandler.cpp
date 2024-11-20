@@ -31,25 +31,20 @@ void eventLoop(void* v) {
 	pinMode(rightKey, INPUT);
 	TickType_t lastWakeTime = xTaskGetTickCount();
 	const TickType_t delta = pdMS_TO_TICKS(1000/(Hz));
-	//Serial.print("eventHandler.cpp: eventLoop 1\n");
 	while(1) {
 		TickType_t loopStartTime = xTaskGetTickCount();
 		if(checkSnakeBite(p->s, p->a)) {
 			xTaskCreate(handleSnakeBite,"Snake Bite Handler",5000,v,10,NULL);
 		}
-		//Serial.print("eventHandler.cpp: eventLoop 2\n");
 		if(checkSnakeTouch(p->s)) {
 			*(p->game) = false;
 		}
-		//Serial.print("eventHandler.cpp: eventLoop 3\n");
 		if(checkButtonLeft(leftKey, &oldButtonLeft)) {
 			xTaskCreate(handleButtonLeft,"Snake Bite Handler",5000,v,10,NULL);
 		}
-		//Serial.print("eventHandler.cpp: eventLoop 4\n");
 		if(checkButtonRight(rightKey, &oldButtonRight)) {
 			xTaskCreate(handleButtonRight,"Snake Bite Handler",5000,v,10,NULL);
 		}
-		//Serial.print("eventHandler.cpp: eventLoop 5\n");
 		
 		TickType_t loopEndTime = xTaskGetTickCount();
 
@@ -61,8 +56,6 @@ void eventLoop(void* v) {
 }
 
 bool checkSnakeBite(snake* s, apple* a) {
-	//Serial.print("eventHandler.cpp: checkSnakeBite 1\n");
-	//printSnake(s);
 
 	if(getSnakeHead(s)->x == a->body->x && getSnakeHead(s)->y == a->body->y) {
 		return true;
@@ -73,23 +66,18 @@ bool checkSnakeBite(snake* s, apple* a) {
 }
 
 bool checkSnakeTouch(snake* s) {
-	//Serial.print("eventHandler.cpp: checkSnakeTouch 1\n");
 	pos* head = getSnakeHead(s);
-	pos* body = s->body;//->next;
-	//Serial.print("eventHandler.cpp: checkSnakeTouch 2\n");
-	//printSnake(s);
+	pos* body = s->body;
+	
 	while(body->next) {
 		if(head->x == body->x && head->y == body->y) {
-			//Serial.print("snakeTouech true\n");
 			return true;
 		}
 		body = body->next;
 	}
-	//Serial.print("eventHandler.cpp: checkSnakeTouch 3\n");
 	if(getSnakeHead(s)->x == resolutionx) { // Check if snake hits right border
 		return true;
 	}
-	//Serial.print("eventHandler.cpp: checkSnakeTouch 4\n");
 	if(getSnakeHead(s)->y == resolutiony) { // Check if snake hits bottom/upper border
 		return true;
 	}
@@ -99,11 +87,9 @@ bool checkSnakeTouch(snake* s) {
 }
 
 bool checkButtonLeft(int button, int* old) {
-	//Serial.print("eventHandler.cpp: checkButtonLeft 1\n");
 	int currentTime = millis();
 
 	if(digitalRead(button) && currentTime - lastTimePressedLeft > inputDelay) {
-		//Serial.print("eventHandler.cpp: checkButtonLeft 2\n");
 		*old = digitalRead(button);
 		lastTimePressedLeft = currentTime;
 		return true;
@@ -112,11 +98,9 @@ bool checkButtonLeft(int button, int* old) {
 }
 
 bool checkButtonRight(int button, int* old) {
-	//Serial.print("eventHandler.cpp: checkButtonRight 1\n");
 	int currentTime = millis();
 
 	if(digitalRead(button) && currentTime - lastTimePressedRight > inputDelay) {
-		////Serial.print("eventHandler.cpp: checkButtonRight 2\n");
 		*old = digitalRead(button);
 		lastTimePressedRight = currentTime;
 		return true;
@@ -125,21 +109,15 @@ bool checkButtonRight(int button, int* old) {
 }
 
 void handleSnakeBite(void* v) {
-	////Serial.print("eventHandler.cpp: handleSnakeBite 1\n");
 	param* p = (param*)v;
-	////Serial.print("eventHandler.cpp: handleSnakeBite 2\n");
 	snakeGrow(p->s);
-	//Serial.print("eventHandler.cpp: handleSnakeBite 3\n");
 	moveApple(p->s, p->a, p->pixels);
-	//Serial.print("eventHandler.cpp: handleSnakeBite 4\n");
 	vTaskDelete( NULL ); // Task kills itself
 }
 
 void handleButtonLeft(void* v) {
 	param* p = (param*) v;
-	//Serial.print("eventHandler.cpp: handleButtonLeft 1\n");
 	p->s->orientation++;
-	//Serial.print("eventHandler.cpp: handleButtonLeft 2\n");
 	if(p->s->orientation > 3) {
 		p->s->orientation = 0;
 	}
@@ -148,9 +126,7 @@ void handleButtonLeft(void* v) {
 
 void handleButtonRight(void* v) {
 	param* p = (param*)v;
-	//Serial.print("eventHandler.cpp: handleButtonRight 1\n");
 	p->s->orientation--;
-	//Serial.print("eventHandler.cpp: handleButtonRight 2\n");
 	if(p->s->orientation < 0) {
 		p->s->orientation = 3;
 	}
@@ -165,8 +141,8 @@ void handleGameOver(TFT_eSprite * spr, int buttonStateLeft, int buttonStateRight
 		spr->drawString("GAME OVER",10,120,GFXFF);
 		spr->pushSprite(0, 0);
 		while(1){
-		buttonStateLeft = digitalRead(leftKey);   //left
-		buttonStateRight = digitalRead(rightKey);
+		buttonStateLeft = digitalRead(leftKey);   // left
+		buttonStateRight = digitalRead(rightKey); // right
 			if(buttonStateLeft != digitalRead(leftKey) || buttonStateRight != digitalRead(rightKey)){
 				break;
 			}
@@ -180,7 +156,6 @@ void handleGameOver(TFT_eSprite * spr, int buttonStateLeft, int buttonStateRight
 
 void printSnake(snake* s) {
 	pos* head = getSnakeHead(s);
-	//pos* body = s->body->next;
 	pos* body = s->body;
 	Serial.printf("Snake Head x: %d, y: %d\t", head->x, head->y);
 	while(body) {

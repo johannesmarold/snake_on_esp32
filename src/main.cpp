@@ -149,7 +149,7 @@ void loop() {
 	draw(pixels,&spr);
 	
 	if(!(*p->game)) {
-		//Serial.print("GAME OVER\nGAME OVER\nGAME OVER\nGAME OVER\nGAME OVER\nGAME OVER\n");
+		Serial.print("GAME OVER\nGAME OVER\nGAME OVER\nGAME OVER\nGAME OVER\nGAME OVER\n");
 		//GAME OVER !
 		*p->game = true;
 		if (score > highscore) {
